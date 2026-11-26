@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Babak Final ESMO-4</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 24px;
+      display: flex;
+      justify-content: center;
+    }
+    .card {
+      background: #fff;
+      width: 100%;
+      max-width: 680px;
+      padding: 32px 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+    .title span:nth-child(1) { color: #2563eb; }
+    .title span:nth-child(2) { color: #eab308; }
+    .title span:nth-child(3) { color: #16a34a; }
+    input {
+      width: 80%;
+      max-width: 420px;
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      margin-top: 8px;
+      font-size: 15px;
+    }
+    .btn-group { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+    button, a.btn {
+      border: none;
+      border-radius: 6px;
+      padding: 10px 16px;
+      color: #fff;
+      font-weight: bold;
+      text-decoration: none;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .btn-blue { background: #1d70f5; }
+    .btn-green { background: #1ea34a; }
+    #hasil { margin-top: 20px; text-align: left; }
+    .item { background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 8px; margin-bottom: 10px; }
+    .meta { margin-top: 24px; font-size: 14px; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>BABAK FINAL</h2>
+    <h1 class="title"><span>E</span><span>S</span><span>M</span><span>O</span>-4</h1>
+
+    <p>Masukkan Nama Peserta:</p>
+    <input type="text" id="keyword" placeholder="Contoh: AZALEA" />
+    <div class="btn-group">
+      <button class="btn-blue" onclick="cariData()">Cari Data</button>
+    </div>
+
+    <div id="hasil"></div>
+
+    <div class="meta">
+      <p><strong>🏆 ✨ JADWAL FINAL ESMO4 ✨ 🏆</strong></p>
+      <p>🔤 ENGLISH: Minggu, 22 November 2026<br>
+         📐 MATH: Minggu, 29 November 2026<br>
+         🧬 SAINS: Minggu, 06 Desember 2026</p>
+
+      <div class="btn-group">
+        <a class="btn btn-green" href="LINK_JUKNIS" target="_blank">📄 Baca Juknis FINAL ESMO4</a>
+        <a class="btn btn-green" href="LINK_JADWAL_PDF" target="_blank">📄 Baca JADWAL PDF</a>
+      </div>
+      <div class="btn-group">
+        <a class="btn btn-green" href="LINK_CBT" target="_blank">🌐 Login CBT AIS Institute</a>
+      </div>
+
+      <p><strong>Admin Pendaftaran:</strong><br>Miss Khusnul (0822-4591-8339)</p>
+      <p><strong>Operator Sistem:</strong><br>Miss Yuni (0858-1533-0554)</p>
+    </div>
+  </div>
+
+  <script>
+    const CSV_URL = "GANTI_DENGAN_LINK_CSV_GOOGLE_SHEETS";
+
+    async function cariData() {
+      const q = document.getElementById("keyword").value.trim().toLowerCase();
+      const hasilEl = document.getElementById("hasil");
+      if (!q) {
+        hasilEl.innerHTML = "<p style='color:#dc2626;text-align:center;'>Silakan masukkan nama peserta.</p>";
+        return;
+      }
+      hasilEl.innerHTML = "<p style='text-align:center;'>Mencari data...</p>";
+
+      try {
+        const res = await fetch(CSV_URL);
+        const text = await res.text();
+        const rows = text.trim().split("\n").map(r => r.split(","));
+        const headers = rows[0].map(h => h.trim().toLowerCase());
+        const namaIdx = headers.indexOf("nama");
+
+        const matches = rows.slice(1).filter(cols =>
+          (cols[namaIdx] || "").toLowerCase().includes(q)
+        );
+
+        if (matches.length === 0) {
+          hasilEl.innerHTML = "<p style='text-align:center;'>Data peserta tidak ditemukan.</p>";
+          return;
+        }
+
+        hasilEl.innerHTML = matches.map(cols => {
+          let detail = headers.map((h, i) => `<div><strong>${h}:</strong> ${cols[i] || "-"}</div>`).join("");
+          return `<div class="item">${detail}</div>`;
+        }).join("");
+      } catch (err) {
+        hasilEl.innerHTML = "<p style='color:#dc2626;text-align:center;'>Gagal memuat data.</p>";
+      }
+    }
+  </script>
+</body>
+</html>
